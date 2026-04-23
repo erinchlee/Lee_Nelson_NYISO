@@ -23,6 +23,8 @@ North Carolina is driven more by changes in demand such as increased electric
 cooling than by changes in climate variability alone, highlighting the need for 
 targeted demand-side management and energy efficiency policies.
 
+
+
 ## Introduction
 
 In North Carolina, residential electricity demand, which is the largest and most 
@@ -44,8 +46,6 @@ variability or structural changes in electricity use. By identifying drivers of
 demand fluctuations, this study provides insight into how North Carolina’s 
 electricity system can improve grid resilience and meet peak demand moving 
 forward.
-
-
 
 
 
@@ -91,6 +91,8 @@ final_data <- weather_data %>%
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+
+
 ## Step 1. Current Data Landscape: NC Energy Consumption & Sectoral Share
 
 The primary goal of Step 1 is to establish a baseline profile of 
@@ -102,6 +104,11 @@ context for our subsequent analysis of weather sensitivity, ultimately
 highlighting how increasing climate volatility and expanding temperature 
 amplitudes are amplifying residential electricity peaks—a trend that poses 
 growing risks to future grid reliability.
+
+
+Research Question 1: Which sector holds the largest stake in North Carolina’s energy portfolio, and which exhibits the most significant volatility?
+
+Hypothesis 1: The residential sector is the most significant driver of the state's energy fluctuations.
 
 
 ### 1-1. Visualization: Sectoral Electricity Consumption Patterns
@@ -225,6 +232,7 @@ primary source of uncertainty and extreme fluctuations in the state's power
 grid.
 
 
+
 ## Step 2. Sensitivity Analysis 
 
 In Step 1, we identified that North Carolina’s electricity landscape is 
@@ -248,6 +256,11 @@ Analysis to examine the relationship between temperature and demand. By
 utilizing specialized metrics such as Heating Degree Days (HDD) and Cooling 
 Degree Days (CDD), we will demonstrate that what appears to be random volatility 
 is, in fact, a highly predictable response to North Carolina's climate patterns.
+
+
+Research Question 2: What is the exact relationship between outdoor temperature and electricity consumption, and how many units of electricity are consumed for every degree of deviation from the balance point (65°F)?
+
+Hypothesis 2: While industrial and commercial sectors maintain a steady "Base Load," residential demand is heavily dictated by human comfort and behavioral responses to the environment.
 
 
 ###2-1.Visualization: The Non-linear Relationship between Temperature and Demand
@@ -488,6 +501,7 @@ monthly variation in North Carolina’s residential electricity consumption is
 directly attributable to weather-driven heating and cooling needs.
 
 
+
 ## Step 3. Future Outlook & Trend Analysis: Climate Volatility and Peak Trends
 
 Building upon the previous sectoral and sensitivity analyses, Step 3 shifts the 
@@ -501,6 +515,11 @@ peaks in the residential sector. By analyzing the synchronization between
 temperature amplitude and peak demand, we aim to demonstrate that the challenges 
 for North Carolina’s grid are not just about "average" demand, but about the 
 widening variance and extreme outliers that threaten infrastructure capacity.
+
+
+Research Question 3: Are increasing electricity peaks associated with rising temperature variability or structural changes in electricity use?
+
+Hypothesis 3: Increasing climate volatility and high-amplitude temperature swings are directly amplifying electricity peaks in the residential sector.
 
 
 ### 3-1. Time Series Analysis: Synchronization of Temperature Amplitude and Demand
@@ -620,6 +639,7 @@ weather swings now pose a greater threat to the infrastructure than they did two
 decades ago.
 
 
+
 ## Conclusion & Policy Implications
 
 ### Summary of Findings
@@ -690,4 +710,5 @@ volatility.
 
 
 
+Git Reposisotry: https://github.com/erinchlee/Lee_Nelson_NYISO
 
