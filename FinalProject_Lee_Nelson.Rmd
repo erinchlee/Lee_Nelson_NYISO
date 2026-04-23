@@ -2,18 +2,58 @@
 title: "NC Electricity Demand Analysis"
 author: "Erin Lee and Lexi Nelson"
 date: "2026-04-23"
-output: html_document
+output:
+  pdf_document:
+    latex_engine: xelatex
 ---
 
+## Executive Summary
+
+Our project analyzes the relationship between temperature and electricity demand 
+in North Carolina from 2000 to 2025. A visual is provided that highlights 
+sectoral differences across residential, commercial, and industrial customers. 
+The results of sensitivity analysis confirm our hypothesis that the residential 
+sector is both the largest contributor to total demand and the primary source of 
+volatility, exhibiting strong seasonal peaks driven by heating and cooling 
+needs. Demand is shown to increase most sharply during extreme heat but also 
+during cold conditions. Time series decomposition reveals that even as 
+residential demand peaks have intensified, temperature variability itself has 
+not significantly increased over time. This suggests that growing grid stress in 
+North Carolina is driven more by changes in demand such as increased electric 
+cooling than by changes in climate variability alone, highlighting the need for 
+targeted demand-side management and energy efficiency policies.
+
 ## Introduction
+
+In North Carolina, residential electricity demand, which is the largest and most 
+variable component of the total electricity demand, is strongly influenced by 
+temperature fluctuations that affect heating and cooling needs. Understanding 
+the sectoral response to temperature changes is critical for ensuring grid 
+reliability and informing future planning. This project examines monthly 
+electricity demand from 2000 to 2025 across the residential, commercial, and 
+industrial sectors. We integrate these data with average temperature, heating 
+degree days (HDD), and cooling degree days (CDD) to explore the drivers of 
+demand variability.
+The analysis has three components. First, we show a baseline comparison 
+of sectoral demand to highlight differences in scale and volatility across 
+residential, commercial, and industrial electricity demand. Second, the 
+sensitivity of each sector to temperature changes is demonstrated using both 
+visual and statistical methods. Finally, long term trends are evaluated to 
+determine whether increasing demand peaks are associated with rising temperature 
+variability or structural changes in electricity use. By identifying drivers of 
+demand fluctuations, this study provides insight into how North Carolina’s 
+electricity system can improve grid resilience and meet peak demand moving 
+forward.
+
+
 
 
 
 ```{r setup, include=FALSE}
 
-library(tidyverse)
+library(tidyverse); library(lubridate)
 
-# 1. Load temp data
+# 1. Load temperature data
 avg_temp <- read_csv("data_NC/AverageTemp.csv", skip = 2) %>% 
   rename(AvgTemp = Value)
 
@@ -53,12 +93,24 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Step 1. Current Data Landscape: NC Energy Consumption & Sectoral Share
 
-The primary goal of Step 1 is to establish a baseline profile of North Carolina’s energy demand. By disaggregating total consumption into Residential, Commercial, and Industrial sectors, we can identify which groups hold the largest stake in the state's energy portfolio and which exhibit the most significant volatility. This initial assessment provides the necessary context for our subsequent analysis of weather sensitivity, ultimately highlighting how increasing climate volatility and expanding temperature amplitudes are amplifying residential electricity peaks—a trend that poses growing risks to future grid reliability.
+The primary goal of Step 1 is to establish a baseline profile of 
+North Carolina’s energy demand. By disaggregating total consumption into 
+Residential, Commercial, and Industrial sectors, we can identify which groups 
+hold the largest stake in the state's energy portfolio and which exhibit the 
+most significant volatility. This initial assessment provides the necessary 
+context for our subsequent analysis of weather sensitivity, ultimately 
+highlighting how increasing climate volatility and expanding temperature 
+amplitudes are amplifying residential electricity peaks—a trend that poses 
+growing risks to future grid reliability.
 
 
-### 1-1. Visulaization: Sectoral Electricity Consumption Patterns
+### 1-1. Visualization: Sectoral Electricity Consumption Patterns
 
-This visualization illustrates the monthly electricity demand trends in North Carolina across the Residential, Commercial, and Industrial sectors from 2000 to 2025. It serves as the empirical foundation for our hypothesis: that the residential sector is the most significant driver of the state's energy fluctuations.
+This visualization illustrates the monthly electricity demand trends in North 
+Carolina across the Residential, Commercial, and Industrial sectors from 2000 to 
+2025. It serves as the empirical foundation for our hypothesis: that the 
+residential sector is the most significant driver of the state's energy 
+fluctuations.
 
 
 ```{r sectoral_demand_plot}
@@ -86,7 +138,8 @@ ggplot(demand_long, aes(x = Date, y = Demand, color = Sector)) +
     date_labels = "%Y"
   ) + 
   labs(title = "Monthly Electricity Demand in North Carolina by Sector",
-       subtitle = "Residential sector shows extreme volatility compared to stable base loads",
+       subtitle = "Residential sector shows extreme volatility 
+       compared to stable base loads",
        x = "Year",
        y = "Electricity Demand (Million kWh)",
        color = "Sector") +
@@ -100,23 +153,37 @@ Key Findings:
 
 (1) Dominance and Seasonality of Residential Demand
 
-The Residential sector (blue line) not only accounts for the highest overall consumption but also exhibits sharp, recurring "spikes" that dwarf the other sectors. The recurring double-peak pattern—peaking in both summer and winter—empirically confirms that residential demand is primarily driven by seasonal heating and cooling requirements.
+The Residential sector (blue line) not only accounts for the highest overall 
+consumption but also exhibits sharp, recurring "spikes" that dwarf the other 
+sectors. The recurring double-peak pattern—peaking in both summer and 
+winter—empirically confirms that residential demand is primarily driven by 
+seasonal heating and cooling requirements.
 
 (2) High Volatility vs. Stable Base Load
 
-In contrast to the residential peaks, the Industrial (green) and Commercial (orange) sectors remain relatively flat and consistent over time. The Industrial sector, in particular, demonstrates a classic "Base Load" profile, where demand remains largely independent of outdoor temperature or seasonal transitions, reflecting constant operational needs.
+In contrast to the residential peaks, the Industrial (green) and Commercial 
+(orange) sectors remain relatively flat and consistent over time. The 
+Industrial sector, in particular, demonstrates a classic "Base Load" profile, 
+where demand remains largely independent of outdoor temperature or seasonal 
+transitions, reflecting constant operational needs.
 
 (3) Expanding Variance and Peak Escalation
 
-Over the 25-year period, there is a visible trend of increasing peak height in the residential sector. The distance between the troughs and the peaks appears to be widening, suggesting that North Carolina’s grid is facing growing pressure from extreme weather events and climate volatility.
+Over the 25-year period, there is a visible trend of increasing peak height in 
+the residential sector. The distance between the troughs and the peaks appears 
+to be widening, suggesting that North Carolina’s grid is facing growing pressure 
+from extreme weather events and climate volatility.
 
 
 ### 1-2. Statistical Summary: Sectoral Share & Volatility
 
-To provide a more rigorous basis for our observations, we calculated the average consumption share and the Coefficient of Variation (CV) for each sector. The CV is particularly important as it measures relative volatility, allowing us to compare the stability of sectors regardless of their total consumption volume.
+To provide a more rigorous basis for our observations, we calculated the average 
+consumption share and the Coefficient of Variation (CV) for each sector. The CV 
+is particularly important as it measures relative volatility, allowing us to 
+compare the stability of sectors regardless of their total consumption volume.
 
 
-```{r statiscal summary}
+```{r statistical summary}
 
 # 6. Statistical Summary: Sectoral Share and Volatility (CV)
 
@@ -145,25 +212,51 @@ Key findings:
 
 (1) The Largest Stakeholder
 
-The residential sector accounts for the largest share of North Carolina’s electricity demand 43.46%, making its efficiency a top priority for state energy planning.
+The residential sector accounts for the largest share of North Carolina’s 
+electricity demand 43.46%, making its efficiency a top priority for state energy 
+planning.
 
 (2) Disproportionate Volatility
 
-The CV of the Residential sector (21.5) is significantly higher than that of the Industrial(10.6) and Commercial(12.5) sectors. This statistically confirms that while industrial demand is predictable and stable, residential demand is the primary source of uncertainty and extreme fluctuations in the state's power grid.
+The CV of the Residential sector (21.5) is significantly higher than that of the 
+Industrial(10.6) and Commercial(12.5) sectors. This statistically confirms that 
+while industrial demand is predictable and stable, residential demand is the 
+primary source of uncertainty and extreme fluctuations in the state's power 
+grid.
 
 
 ## Step 2. Sensitivity Analysis 
 
-In Step 1, we identified that North Carolina’s electricity landscape is characterized by a high reliance on the residential sector, which also exhibits the most extreme volatility. To ensure grid stability and design effective energy policies, it is crucial to move beyond identifying what is happening and investigate "why" these fluctuations occur.
+In Step 1, we identified that North Carolina’s electricity landscape is 
+characterized by a high reliance on the residential sector, which also exhibits 
+the most extreme volatility. To ensure grid stability and design effective 
+energy policies, it is crucial to move beyond identifying what is happening and 
+investigate "why" these fluctuations occur.
 
-While industrial and commercial sectors maintain a steady "Base Load" for operations, residential demand is heavily dictated by human comfort and behavioral responses to the environment. This sensitivity analysis aims to quantify the exact relationship between outdoor temperature and electricity consumption, providing a data-driven foundation for predicting peak demand. By measuring the "slope" of demand increase per degree of temperature change, we can identify the primary drivers of grid volatility and establish a clear mandate for targeted energy efficiency policies, such as residential insulation and smart load management, to enhance overall grid resilience.
+While industrial and commercial sectors maintain a steady "Base Load" for 
+operations, residential demand is heavily dictated by human comfort and 
+behavioral responses to the environment. This sensitivity analysis aims to 
+quantify the exact relationship between outdoor temperature and electricity 
+consumption, providing a data-driven foundation for predicting peak demand. By 
+measuring the "slope" of demand increase per degree of temperature change, we 
+can identify the primary drivers of grid volatility and establish a clear 
+mandate for targeted energy efficiency policies, such as residential insulation 
+and smart load management, to enhance overall grid resilience.
 
-In this section, we will employ both Scatter Plots (U-Curve) and Regression Analysis to examine the relationship between temperature and demand. By utilizing specialized metrics such as Heating Degree Days (HDD) and Cooling Degree Days (CDD), we will demonstrate that what appears to be random volatility is, in fact, a highly predictable response to North Carolina's climate patterns.
+In this section, we will employ both Scatter Plots (U-Curve) and Regression 
+Analysis to examine the relationship between temperature and demand. By 
+utilizing specialized metrics such as Heating Degree Days (HDD) and Cooling 
+Degree Days (CDD), we will demonstrate that what appears to be random volatility 
+is, in fact, a highly predictable response to North Carolina's climate patterns.
 
 
-### 2-1. Visualization: The Non-linear Relationship between Temperature and Demand
+###2-1.Visualization: The Non-linear Relationship between Temperature and Demand
 
-To empirically observe how temperature dictates energy consumption, we first visualize the relationship between the average monthly temperature and electricity demand across different sectors. This visual exploration is critical because energy demand does not follow a simple linear path; rather, it responds to the physical necessity of maintaining thermal comfort. 
+To empirically observe how temperature dictates energy consumption, we first 
+visualize the relationship between the average monthly temperature and 
+electricity demand across different sectors. This visual exploration is critical 
+because energy demand does not follow a simple linear path; rather, it responds 
+to the physical necessity of maintaining thermal comfort. 
 
 ```{r temp_demand_scatter}
 
@@ -187,7 +280,8 @@ ggplot(scatter_data, aes(x = AvgTemp, y = Demand, color = Sector)) +
   # Add smooth trend lines to highlight the U-curve
   geom_smooth(method = "loess", se = FALSE, linewidth = 1.2) +
   labs(title = "Temperature vs. Electricity Demand by Sector",
-       subtitle = "Residential sector exhibits a clear U-curve response to temperature",
+       subtitle = "Residential sector exhibits a clear U-curve response to 
+       temperature",
        x = "Average Temperature (°F)",
        y = "Electricity Demand (Million kWh)",
        color = "Sector") +
@@ -203,25 +297,42 @@ Key Findings:
 
 (1) Distinct U-Curve for Residential Sector
 
-The blue line (Residential) shows a clear U-shaped curve, indicating that electricity demand surges during both extreme cold (left) and extreme heat (right). This confirms that residential consumption is heavily driven by space heating and cooling needs. 
+The blue line (Residential) shows a clear U-shaped curve, indicating that 
+electricity demand surges during both extreme cold (left) and extreme heat 
+(right). This confirms that residential consumption is heavily driven by space 
+heating and cooling needs. 
 
 (2) Stable Base Load in Industrial & Commercial Sectors
 
-In contrast, the Green (Industrial) and Orange (Commercial) lines are relatively flat, representing a "Base Load." Their electricity use remains consistent regardless of temperature changes, as industrial processes and office operations are less dependent on outdoor weather.
+In contrast, the Green (Industrial) and Orange (Commercial) lines are relatively 
+flat, representing a "Base Load." Their electricity use remains consistent 
+regardless of temperature changes, as industrial processes and office operations 
+are less dependent on outdoor weather.
 
 (3) The "Comfort Zone" or Balance Point
 
-The lowest demand for all sectors occurs around 50°F to 70°F, where neither heating nor cooling is aggressively required.
+The lowest demand for all sectors occurs around 50°F to 70°F, where neither 
+heating nor cooling is aggressively required.
 
 
 ### 2-2. Numerical Analysis: Quantifying the Sensitivity of Sectoral Demand
 
-Following the visual confirmation of the "U-curve" relationship, this section provides a rigorous numerical assessment of how electricity demand reacts to temperature fluctuations. To achieve this, we utilize a "Balance Point" of 65°F as the analytical threshold. In energy science, this standard assumes that at an outdoor temperature of 65°F, internal heat gains—produced by occupants, lighting, and appliances—are sufficient to maintain a comfortable indoor environment without the need for supplemental heating or cooling.
+Following the visual confirmation of the "U-curve" relationship, this section 
+provides a rigorous numerical assessment of how electricity demand reacts to 
+temperature fluctuations. To achieve this, we utilize a "Balance Point" of 65°F
+as the analytical threshold. In energy science, this standard assumes that at an 
+outdoor temperature of 65°F, internal heat gains—produced by occupants, 
+lighting, and appliances—are sufficient to maintain a comfortable indoor 
+environment without the need for supplemental heating or cooling.
 
-By bifurcating the data into Heating (<65°F) and Cooling (≥65°F) seasons, we can calculate the specific "Slope" (MWh/°F) for each sector. This allows us to quantify exactly how many units of electricity are consumed for every degree of deviation from the balance point, effectively identifying which sectors are the primary drivers of weather-induced load volatility.
+By bifurcating the data into Heating (<65°F) and Cooling (≥65°F) seasons, we can 
+calculate the specific "Slope" (MWh/°F) for each sector. This allows us to 
+quantify exactly how many units of electricity are consumed for every degree of 
+deviation from the balance point, effectively identifying which sectors are the 
+primary drivers of weather-induced load volatility.
 
 
-```{r numericl analysis}
+```{r numerical analysis}
 
 # 8. Numerical Analysis: Slopes for Heating and Cooling Seasons
 # Setting the balance point at 65°F
@@ -261,22 +372,37 @@ Key Findings:
 
 (1) Dominant Temperature Sensitivity in Residential Sector
 
-The Residential sector shows the highest sensitivity to temperature. During the cooling season, for every 1°F increase in average temperature, residential electricity demand increases by approximately 191.6 million kWh. The high R-squared value (0.73) indicates that over 73% of the variation in residential demand can be explained by temperature alone, confirming it as the primary driver of consumption.
+The Residential sector shows the highest sensitivity to temperature. During the 
+cooling season, for every 1°F increase in average temperature, residential 
+electricity demand increases by approximately 191.6 million kWh. The high 
+R-squared value (0.73) indicates that over 73% of the variation in residential 
+demand can be explained by temperature alone, confirming it as the primary 
+driver of consumption.
 
 (2) Asymmetric Response: Cooling vs. Heating
 
-The slope for the cooling season (191.64) is nearly double the magnitude of the heating season (-100.04). This suggests that in North Carolina, the reliance on electricity for air conditioning during summer is significantly more intense than the electricity used for heating in winter.
+The slope for the cooling season (191.64) is nearly double the magnitude of the 
+heating season (-100.04). This suggests that in North Carolina, the reliance on 
+electricity for air conditioning during summer is significantly more intense 
+than the electricity used for heating in winter.
 
 (3) Minimal Impact on Industrial & Commercial Sectors
 
-In stark contrast, the Industrial sector shows a slope of only 6.23 during the cooling season with an R-squared near zero (0.01). This statistically proves that industrial demand is a "Base Load" that remains constant regardless of weather conditions. The Commercial sector shows some sensitivity during summer (Slope: 67.5) but is still only about one-third as sensitive as the residential sector.
+In stark contrast, the Industrial sector shows a slope of only 6.23 during the 
+cooling season with an R-squared near zero (0.01). This statistically proves 
+that industrial demand is a "Base Load" that remains constant regardless of 
+weather conditions. The Commercial sector shows some sensitivity during summer 
+(Slope: 67.5) but is still only about one-third as sensitive as the residential 
+sector.
 
 
 ### 2-3. Statistical Test for Slop Differences
 
-To strictly verify whether the temperature sensitivity (slope) differs between sectors, a linear regression model with an interaction term (AvgTemp * Sector) was performed for the cooling season.
+To strictly verify whether the temperature sensitivity (slope) differs between 
+sectors, a linear regression model with an interaction term (AvgTemp * Sector) 
+was performed for the cooling season.
 
-```{r staticial validation}
+```{r statistical validation}
 
 # 9. Statistical Test for Slope Differences using Interaction Terms
 
@@ -299,19 +425,34 @@ Key Findings:
 
 (1) The interaction term AvgTem
 
-SectorDemand_Res represents the difference in slopes between the Commercial (baseline) and Residential sectors. The positive coefficient (124.11) and the extremely low p-value (< 0.001) statistically prove that the Residential sector's demand increases significantly faster than other sectors as temperature rises.
+SectorDemand_Res represents the difference in slopes between the Commercial 
+(baseline) and Residential sectors. The positive coefficient (124.11) and the 
+extremely low p-value (< 0.001) statistically prove that the Residential 
+sector's demand increases significantly faster than other sectors as temperature 
+rises.
 
 (2) Robust Model Reliability
 
-An R-squared value of 0.9268 indicates an exceptionally high model fit, confirming that the combination of temperature and sectoral characteristics almost perfectly predicts electricity demand patterns in North Carolina.
+An R-squared value of 0.9268 indicates an exceptionally high model fit, 
+confirming that the combination of temperature and sectoral characteristics 
+almost perfectly predicts electricity demand patterns in North Carolina.
 
 
 ### 2-4. Correlation Analysis
 
-While the previous regression analysis measured the "magnitude" of demand changes, the correlation analysis focuses on the "consistency" of the relationship. By utilizing Cooling Degree Days (CDD) and Heating Degree Days (HDD)—metrics specifically designed to reflect energy requirements—we can determine how much of the residential demand volatility is strictly governed by climate. This step is essential to confirm that the observed fluctuations are not random outliers but a highly synchronized response to North Carolina’s seasonal variations.
+While the previous regression analysis measured the "magnitude" of demand 
+changes, the correlation analysis focuses on the "consistency" of the 
+relationship. By utilizing Cooling Degree Days (CDD) and Heating Degree Days 
+(HDD)—metrics specifically designed to reflect energy requirements—we can 
+determine how much of the residential demand volatility is strictly governed by 
+climate. This step is essential to confirm that the observed fluctuations are 
+not random outliers but a highly synchronized response to North Carolina’s 
+seasonal variations.
 
-* CDD(Cooling Degree Days): A measure of how much the outdoor temperature stays above 65°F, representing the energy needed for air conditioning.
-  HDD(Heating Degree Days): A measure of how much the outdoor temperature stays below 65°F, representing the energy needed for heating.
+* CDD(Cooling Degree Days): A measure of how much the outdoor temperature stays 
+above 65°F, representing the energy needed for air conditioning.
+  HDD(Heating Degree Days): A measure of how much the outdoor temperature stays 
+  below 65°F, representing the energy needed for heating.
 
 ```{r correlation_analysis}
 
@@ -335,23 +476,42 @@ Key Findings:
 
 (1) High Degree of Synchronization
 
-Both seasons exhibit correlation coefficients exceeding 0.83, which represents an extremely strong positive linear relationship. This indicates that as the thermal stress on a building increases, the electricity demand follows a nearly identical trajectory.
+Both seasons exhibit correlation coefficients exceeding 0.83, which represents 
+an extremely strong positive linear relationship. This indicates that as the 
+thermal stress on a building increases, the electricity demand follows a nearly 
+identical trajectory.
 
 (2) Explanatory Power
 
-By squaring these coefficients, we find that approximately 70% to 73% of the monthly variation in North Carolina’s residential electricity consumption is directly attributable to weather-driven heating and cooling needs.
+By squaring these coefficients, we find that approximately 70% to 73% of the 
+monthly variation in North Carolina’s residential electricity consumption is 
+directly attributable to weather-driven heating and cooling needs.
 
 
 ## Step 3. Future Outlook & Trend Analysis: Climate Volatility and Peak Trends
 
-Building upon the previous sectoral and sensitivity analyses, Step 3 shifts the focus toward the future outlook by examining the impact of climate volatility. As extreme weather events become more frequent, the "predictable" seasonal patterns are being replaced by high-amplitude temperature swings.
+Building upon the previous sectoral and sensitivity analyses, Step 3 shifts the 
+focus toward the future outlook by examining the impact of climate volatility. 
+As extreme weather events become more frequent, the "predictable" seasonal 
+patterns are being replaced by high-amplitude temperature swings.
 
-The analytical goal of this section is to investigate how these extreme temperature ranges (Max-Min differences) are directly amplifying electricity peaks in the residential sector. By analyzing the synchronization between temperature amplitude and peak demand, we aim to demonstrate that the challenges for North Carolina’s grid are not just about "average" demand, but about the widening variance and extreme outliers that threaten infrastructure capacity.
+The analytical goal of this section is to investigate how these extreme 
+temperature ranges (Max-Min differences) are directly amplifying electricity 
+peaks in the residential sector. By analyzing the synchronization between 
+temperature amplitude and peak demand, we aim to demonstrate that the challenges 
+for North Carolina’s grid are not just about "average" demand, but about the 
+widening variance and extreme outliers that threaten infrastructure capacity.
 
 
 ### 3-1. Time Series Analysis: Synchronization of Temperature Amplitude and Demand
 
-To examine the immediate impact of climate volatility on the energy system, this section analyzes the synchronization between Temperature Amplitude (Max-Min Range) and residential electricity demand. Our initial objective was to observe whether the "spikiness" of weather fluctuations directly dictates the timing and magnitude of residential peaks. By overlaying these two variables, we aim to visualize the direct coupling of environmental instability and grid stress.
+To examine the immediate impact of climate volatility on the energy system, this 
+section analyzes the synchronization between Temperature Amplitude 
+(Max-Min Range) and residential electricity demand. Our initial objective was to 
+observe whether the "spikiness" of weather fluctuations directly dictates the 
+timing and magnitude of residential peaks. By overlaying these two variables, we
+aim to visualize the direct coupling of environmental instability and grid 
+stress.
 
 
 ```{r time series}
@@ -369,7 +529,8 @@ split_scale <- 80
 
 ggplot(step3_data, aes(x = Date)) +
   # max-min temp
-  geom_line(aes(y = Temp_Range * split_scale), color = "gray85", size = 0.5, alpha = 0.7) +
+  geom_line(aes(y = Temp_Range * split_scale), 
+            color = "gray85", size = 0.5, alpha = 0.7) +
   
   # residential elec demand
   geom_line(aes(y = Demand_Res), color = "#2c7fb8", size = 0.8) +
@@ -378,7 +539,8 @@ ggplot(step3_data, aes(x = Date)) +
   scale_y_continuous(
     name = "Residential Demand (MWh)",
     limits = c(0, 9000), 
-    sec.axis = sec_axis(~./split_scale, name = "Temperature Range (Max-Min, °F)")
+    sec.axis = 
+      sec_axis(~./split_scale, name = "Temperature Range (Max-Min, °F)")
   ) +
   labs(title = "Trend Analysis: Temperature Range vs. Residential Demand",
        subtitle = "Blue: Demand (Upper) | Gray: Temp Range (Lower)",
@@ -389,12 +551,20 @@ ggplot(step3_data, aes(x = Date)) +
 ```
 Key Findings:
 
-The time-series visualization indicates that while the rhythm of electricity peaks is generally aligned with temperature swings, the visual evidence of "increasing volatility" is not immediately apparent. From a raw data perspective, the amplitude of temperature variations and the resulting demand spikes appear recurring but do not show a clear, observable expansion in variance over the 25-year period. This ambiguity necessitates a more rigorous statistical approach to isolate the underlying trends from seasonal noise.
+The time-series visualization indicates that while the rhythm of electricity 
+peaks is generally aligned with temperature swings, the visual evidence of 
+"increasing volatility" is not immediately apparent. From a raw data 
+perspective, the amplitude of temperature variations and the resulting demand 
+spikes appear recurring but do not show a clear, observable expansion in 
+variance over the 25-year period. This ambiguity necessitates a more rigorous 
+statistical approach to isolate the underlying trends from seasonal noise.
 
 
 ### 3-2. STL Decomposition: Isolating the True Trend by Removing Seasonality
 
-To gain a clearer understanding of the long-term trajectory, we applied STL Decomposition (Seasonal-Trend decomposition using LOESS) to both residential demand and temperature amplitude.
+To gain a clearer understanding of the long-term trajectory, we applied STL 
+Decomposition (Seasonal-Trend decomposition using LOESS) to both residential 
+demand and temperature amplitude.
 
 ```{r STL decomposition - elec demand}
 
@@ -411,7 +581,8 @@ plot(Demand_decomp)
 
 # 13. Eliminating seasonal effect (2) temp range
 
-TempRange_ts <- ts(final_data$MaxTemp - final_data$MinTemp, start = c(2001, 1), frequency = 12)
+TempRange_ts <- ts(final_data$MaxTemp - final_data$MinTemp, start = c(2001, 1), 
+                   frequency = 12)
 
 TempRange_decomp <- stl(TempRange_ts, s.window = "periodic")
 
@@ -422,62 +593,99 @@ plot(TempRange_decomp)
 ```
 Key Findings:
 
-The decomposition results reveal a significant divergence between climate and energy.
+The decomposition results reveal a significant divergence between climate and 
+energy.
 
 (1) Temperature Amplitude
 
-Contrary to our initial hypothesis that increasing climate volatility would be the primary driver of grid instability, the 25-year data shows that temperature variations in North Carolina have remained statistically stable with no significant upward trend in amplitude.
+Contrary to our initial hypothesis that increasing climate volatility would be 
+the primary driver of grid instability, the 25-year data shows that temperature 
+variations in North Carolina have remained stable with no 
+significant upward trend in amplitude.
 
 (2) Residential Demand
 
-Despite this climatic stability, residential electricity demand has exhibited expanding variance and escalating peaks.
+Despite this climatic stability, residential electricity demand has exhibited 
+expanding variance and escalating peaks.
 
 (3) Hypothesis Reflection
 
-These results partially contradict our initial hypothesis. While we expected "worsening weather" to be the driver, the data proves that the structural growth in demand is occurring independently of climate volatility. This means that the growing vulnerability of the grid is not a "climate-side" escalation, but a "demand-side" intensification. The residential sector has become increasingly sensitive to existing weather patterns, meaning even "normal" weather swings now pose a greater threat to the infrastructure than they did two decades ago.
+These results partially contradict our initial hypothesis. While we expected 
+"worsening weather" to be the driver, the data suggests that the structural 
+growth in demand is occurring independently of climate volatility. This means 
+that the growing vulnerability of the grid is not a "climate-side" escalation, 
+but a "demand-side" intensification. The residential sector has become 
+increasingly sensitive to existing weather patterns, meaning even "normal" 
+weather swings now pose a greater threat to the infrastructure than they did two 
+decades ago.
 
 
 ## Conclusion & Policy Implications
 
 ### Summary of Findings
 
-This report investigated the factors threatening the resilience of North Carolina’s electricity grid through multiple analytical lenses:
+This report investigated the factors threatening the resilience of North 
+Carolina’s electricity grid through multiple analytical lenses:
 
-Sectoral Dynamics: Analyses from Steps 1 and 2 confirmed that the Residential Sector, unlike the commercial or industrial sectors, is the primary driver of total grid peaks and is the most sensitive variable to temperature fluctuations.
+Sectoral Dynamics: Analyses from Steps 1 and 2 confirmed that the Residential 
+Sector, unlike the commercial or industrial sectors, is the primary driver of 
+total grid peaks and is the most sensitive variable to temperature fluctuations.
 
-The Volatility Paradox: STL Decomposition in Step 3 revealed that while temperature amplitude has remained stable since 2001, the intensity of residential demand peaks has escalated structurally. This suggests that shifting demographic patterns and residential environments have amplified "demand sensitivity" to existing weather conditions.
+The Volatility Paradox: STL Decomposition in Step 3 revealed that while 
+temperature amplitude has remained stable since 2001, the intensity of 
+residential demand peaks has escalated structurally. This suggests that shifting 
+demographic patterns and residential environments have amplified "demand 
+sensitivity" to existing weather conditions.
 
 
 ### Strategic Policy Recommendations
 
-To address the demand-driven instability identified in this study, the following policies are recommended:
+To address the demand-driven instability identified in this study, the following 
+policies are recommended:
 
 (1) Targeted Demand Response (DR)
 
-Priority should be given to implementing variable pricing and incentive programs specifically for the residential sector, which shows the highest sensitivity to temperature swings.
+Priority should be given to implementing variable pricing and incentive programs 
+specifically for the residential sector, which shows the highest sensitivity to 
+temperature swings.
 
 (2) Residential Efficiency & Weatherization
 
-Given that demand peaks are rising despite stable climate data, structural vulnerabilities such as poor insulation or inefficient HVAC systems in aging housing stocks may be at fault. Policy funding should be concentrated on weatherization programs for low-income and older residential areas to reduce systemic sensitivity.
+Given that demand peaks are rising despite stable climate data, structural 
+vulnerabilities such as poor insulation or inefficient HVAC systems in aging 
+housing stocks may be at fault. Policy funding should be concentrated on 
+weatherization programs for low-income and older residential areas to reduce 
+systemic sensitivity.
 
 (3) Resilient Infrastructure Planning
 
-In spite of stable climate trends, "stress test" standards must be updated to reflect heightened demand elasticity. Conservative reserve margins and distribution grid upgrades in high-density residential areas are essential to accommodate the escalating peak intensity.
+In spite of stable climate trends, "stress test" standards must be updated to 
+reflect heightened demand elasticity. Conservative reserve margins and 
+distribution grid upgrades in high-density residential areas are essential to 
+accommodate the escalating peak intensity.
 
 
 ## Research Limitations & Future Tasks
 
 (1) Temporal Resolution (Hourly vs. Monthly Data)
 
-The primary limitation of this study is the reliance on monthly aggregated data. While effective for identifying long-term structural trends, monthly data masks the intra-day "Peak Intensity" and rapid demand fluctuations (Ramp Rates) that occur within a single hour.
+The primary limitation of this study is the reliance on monthly aggregated data. 
+While effective for identifying long-term structural trends, monthly data masks 
+the intra-day "Peak Intensity" and rapid demand fluctuations (Ramp Rates) that 
+occur within a single hour.
 
 (2) Geographic Scope
 
-This analysis utilized state-level data for North Carolina, which does not account for the significant variance in electricity consumption patterns between high-density urban areas and rural residential zones.
+This analysis utilized state-level data for North Carolina, which does not 
+account for the significant variance in electricity consumption patterns between 
+high-density urban areas and rural residential zones.
 
 (3) Behind-the-Meter (BTM) Factors
 
-The study could not individually isolate the impacts of "Behind-the-Meter" factors, such as residential solar PV adoption or electric vehicle (EV) charging, which are increasingly critical drivers of modern residential demand volatility.
+The study could not individually isolate the impacts of "Behind-the-Meter" 
+factors, such as residential solar PV adoption or electric vehicle (EV) 
+charging, which are increasingly critical drivers of modern residential demand 
+volatility.
 
 
 
